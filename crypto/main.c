@@ -19,14 +19,17 @@ int main(int argc , char const* argv[])
 		position += len;
 	}
 	fclose(fp);
-	buff[position++] = 0xd;
-	buff[position] = 0xa;
-	printf("%s\n" , buff);
-	//printf("%x %x\n" , buff[31] , buff[position]);
-	SHA256(buff , 48 , encrypo_data);
+	//printf("%s\n" , buff);
+	for (uint8_t i = 0;i < MAX_NUM_A_LINE;i++)
+	{
+		printf("%X" , buff[i]);
+	}
+	printf("\n");
+	printf("%s" , buff);
+	SHA256(buff , 46 , encrypo_data);
 	for (uint8_t i = 0;i < SHA256_DIGEST_LENGTH;i++)
 	{
-		printf("%x" , encrypo_data[i]);
+		printf("%X" , encrypo_data[i]);
 	}
 	/* code */
 	return 0;
