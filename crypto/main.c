@@ -4,39 +4,20 @@
 #include "./aes/aes_crypto.h"
 #include "./sha/sha2.h"
 
-#define MAX_NUM_A_LINE	(1024)
+#define MAX_NUM_A_LINE	(256)
 
 void AES_CBC_Test(void);
+void Hash_File(uint8_t* filename , uint8_t* encrypt_data);
 
 int main(int argc , char const* argv[])
 {
 	uint8_t encrypo_data[SHA256_DIGEST_LENGTH];
-	uint8_t buff[MAX_NUM_A_LINE] = {0};
 	uint8_t tmpbuff[60] = {0};
 	uint8_t position = 0u;
-	uint16_t i = 0;
-	SHA256_CTX c;
-	FILE* fp = fopen("./tmp.hex" , "rb");
-	FILE* fp2 = fopen("./FVC2cal.hex" , "rb");
-	SHA256_Init(&c);
 
-	while (!feof(fp2))
-	{
-		unsigned int nCount = fread(buff , 1 , MAX_NUM_A_LINE , fp2);
-		if (ferror(fp2))
-		{
-			printf("\nAn error occurred when accessing the file\n");
-			fclose(fp2);
-			return 0;
-		}
-		SHA256_Update(&c , buff , nCount);
-		printf("count: %d  readbyte: %d\n" , i++ , nCount);
-	}
-	printf("hash dowm!\n");
-	SHA256_Final(encrypo_data , &c);
-	printf("hash final!\n");
-	memset(&c , 0 , sizeof(c));
-	fclose(fp2);
+	uint8_t* file1 = "./tmp.hex";
+	uint8_t* file2 = "./FVC2cal.hex";
+	Hash_File(file2 , encrypo_data);
 	//printf("%s\n" , buff);
 	for (uint8_t i = 0;i < SHA256_DIGEST_LENGTH;i++)
 	{
@@ -65,4 +46,31 @@ void AES_CBC_Test(void)
 		printf("%X" , encrypt_MAC[i]);
 	}
 	printf("\n**********CBC Test end**********\n");
+}
+
+void Hash_File(uint8_t* filename , uint8_t* encrypt_data)
+{
+	SHA256_CTX c;
+	uint8_t buff[MAX_NUM_A_LINE] = {0};
+	uint32_t i = 0;
+	FILE* fp = fopen(filename , "rb");
+	SHA256_Init(&c);
+
+	while (!feof(fp))
+	{
+		unsigned int nCount = fread(buff , 1 , MAX_NUM_A_LINE , fp);
+		if (ferror(fp))
+		{
+			printf("\nAn error occurred when accessing the file\n");
+			fclose(fp);
+			return;
+		}
+		SHA256_Update(&c , buff , nCount);
+		//printf("count: %d  readbyte: %d\n" , i++ , nCount);
+	}
+	printf("hash dowm!\n");
+	SHA256_Final(encrypt_data , &c);
+	printf("hash final!\n");
+	memset(&c , 0 , sizeof(c));
+	fclose(fp);
 }
